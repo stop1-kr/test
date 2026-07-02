@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>도전! 점프 킹</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #1a1a2e;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            touch-action: none; /* 모바일에서 스크롤 방지 */
+        }
+        
+        #gameContainer {
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364); /* 기본 배경, JS에서 동적 변경 */
+        }
+
+        #ui {
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+        }
+
+        /* 픽셀 아트 스타일 느낌을 위한 렌더링 설정 */
+        canvas {
+            image-rendering: -moz-crisp-edges;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            image-rendering: pixelated;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="gameContainer">
+        <!-- UI 오버레이 -->
+        <div id="ui" class="absolute top-4 left-4 text-white font-bold text-xl drop-shadow-md z-10 pointer-events-none">
+            <div class="text-yellow-300">현재 높이: <span id="currentHeight">0</span>m</div>
+            <div class="text-green-400 text-sm mt-1">최고 기록: <span id="highScore">0</span>m</div>
+        </div>
+
+        <!-- 시작 화면 / 설명 -->
+        <div id="startScreen" class="absolute inset-0 flex flex-col items-center justify-center bg-black/80 z-20 backdrop-blur-sm">
+            <h1 class="text-5xl mb-6 text-yellow-400 font-extrabold tracking-wider drop-shadow-lg" style="text-shadow: 0 4px 10px rgba(255, 215, 0, 0.5);">도전! 점프 킹</h1>
+            
+            <div class="bg-white/10 p-6 rounded-xl text-white text-center border border-white/20 mb-8">
+                <p class="text-xl mb-3"><span class="bg-gray-700 px-2 py-1 rounded">←</span> <span class="bg-gray-700 px-2 py-1 rounded">→</span> 이동 및 점프 방향</p>
+                <p class="text-xl mb-3"><span class="bg-gray-700 px-3 py-1 rounded">Space</span> 길게 눌러 파워 충전</p>
+                <p class="text-xl"><span class="bg-gray-700 px-3 py-1 rounded">Space</span> 떼서 <span class="text-red-400 font-bold">점프!</span></p>
+                
+                <div class="mt-5 pt-5 border-t border-white/20 text-sm text-gray-300">
+                    <p>⚠️ 공중에서는 방향을 바꿀 수 없습니다.</p>
+                    <p>⚠️ 벽에 부딪히면 튕겨 나옵니다.</p>
+                    <p>⚠️ 떨어지면... 행운을 빕니다.</p>
+                </div>
+            </div>
+
+            <button id="startBtn" class="px-8 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-black rounded-full font-bold text-2xl transition-all hover:scale-110 shadow-[0_0_15px_rgba(245,158,11,0.6)]">
+                게임 시작
+            </button>
+        </div>
+
+        <!-- 캔버스 -->
+        <canvas id="gameCanvas" width="600" height="800"></canvas>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const startScreen = document.getElementById('startScreen');
+        const startBtn = document.getElementById('startBtn');
+        const heightDisplay = document.getElementById('currentHeight');
+        const highScoreDisplay = document.getElementById('highScore');
+
+        // --- 게임 설정 및 변수 ---
+        const CANVAS_WIDTH = canvas.width;
+        const CANVAS_HEIGHT = canvas.height;
+        
+        let gameState = 'START'; // START, PLAYING
+        let animationId;
+        let cameraY = 0;
+        let maxHeightReached = 0;
+        let highestScore = 0;
+
+        // 키 입력 상태
+        const keys = {
+            ArrowLeft: false,
+            ArrowRight: false,
+            Space: false
+        };
+
+        // --- 플레이어 객체 ---
+        const player = {
+            x: CANVAS_WIDTH / 2 - 15,
+            y: CANVAS_HEIGHT - 100,
+            width: 30,
+            height: 30,
+            vx: 0,
+            vy: 0,
+            color: '#ff4757',
+            
+            // 물리 수치
+            gravity: 0.5,
+            maxFallSpeed: 15,
+            walkSpeed: 3,
+            maxJumpForce: 17,
+            horizontalJumpForce: 6,
+            bounceFactor: 0.6, // 벽에 부딪혔을 때 튕기는 정도
+            
+            // 상태
+            grounded: false,
+            charging: false,
+            chargeLevel: 0,
+            maxCharge: 100,
+            chargeRate: 2.5
+        };
+
+        // --- 맵 (플랫폼) 데이터 ---
+        let platforms = [];
+        
+        function initMap() {
+            platforms = [];
+            // 시작 바닥 (안전 지대)
+            platforms.push({ x: 0, y: CANVAS_HEIGHT - 40, w: CANVAS_WIDTH, h: 40, type: 'ground' });
+            
+            // 절차적 플랫폼 생성 (위로 올라갈수록 생성)
+            let currentY = CANVAS_HEIGHT - 180;
+            const targetMaxHeight = -20000; // 게임의 끝없는 높이
+            
+            // 난이도 상승을 위한 변수들
+            let minGapY = 80;
+            let maxGapY = 150;
+            let minWidth = 100;
+            let maxWidth = 250;
+
+            while (currentY > targetMaxHeight) {
+                // 높이에 따른 난이도 조절
+                if (currentY < -5000) { minWidth = 50; maxWidth = 120; maxGapY = 200; }
+                else if (currentY < -2000) { minWidth = 70; maxWidth = 150; maxGapY = 180; }
+
+                let w = Math.random() * (maxWidth - minWidth) + minWidth;
+                let x = Math.random() * (CANVAS_WIDTH - w);
+                
+                // 가끔 벽(막힌 곳) 생성
+                if (Math.random() < 0.1 && currentY < -500) {
+                    platforms.push({ x: x, y: currentY, w: 20, h: Math.random() * 100 + 50, type: 'wall' });
+                }
+
+                platforms.push({ x: x, y: currentY, w: w, h: 20, type: 'platform' });
+                
+                currentY -= (Math.random() * (maxGapY - minGapY) + minGapY);
+            }
+        }
+
+        // --- 이벤트 리스너 ---
+        window.addEventListener('keydown', (e) => {
+            if (keys.hasOwnProperty(e.code) || e.code === 'Space') {
+                if (e.code === 'Space') keys.Space = true;
+                if (e.code === 'ArrowLeft') keys.ArrowLeft = true;
+                if (e.code === 'ArrowRight') keys.ArrowRight = true;
+                // e.preventDefault(); // 스크롤 방지
+            }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (keys.hasOwnProperty(e.code) || e.code === 'Space') {
+                if (e.code === 'Space') keys.Space = false;
+                if (e.code === 'ArrowLeft') keys.ArrowLeft = false;
+                if (e.code === 'ArrowRight') keys.ArrowRight = false;
+            }
+        });
+
+        startBtn.addEventListener('click', () => {
+            startScreen.style.display = 'none';
+            resetGame();
+            gameState = 'PLAYING';
+            loop();
+        });
+
+        // --- 게임 로직 ---
+        function resetGame() {
+            player.x = CANVAS_WIDTH / 2 - 15;
+            player.y = CANVAS_HEIGHT - 100;
+            player.vx = 0;
+            player.vy = 0;
+            player.chargeLevel = 0;
+            player.charging = false;
+            cameraY = 0;
+            maxHeightReached = 0;
+            initMap();
+        }
+
+        function update() {
+            if (gameState !== 'PLAYING') return;
+
+            // 1. 상태 업데이트 및 입력 처리
+            if (player.grounded) {
+                // 바닥에 있을 때
+                if (keys.Space) {
+                    // 충전 중
+                    player.charging = true;
+                    player.vx = 0; // 충전 중에는 이동 불가
+                    player.chargeLevel += player.chargeRate;
+                    if (player.chargeLevel > player.maxCharge) player.chargeLevel = player.maxCharge;
+                } else {
+                    // 점프 발동 (충전했다가 뗐을 때)
+                    if (player.charging) {
+                        let jumpRatio = player.chargeLevel / player.maxCharge;
+                        // 최소 점프력 보장
+                        if (jumpRatio < 0.2) jumpRatio = 0.2; 
+                        
+                        player.vy = -(player.maxJumpForce * jumpRatio);
+                        
+                        // 방향에 따른 X축 속도
+                        if (keys.ArrowLeft) player.vx = -player.horizontalJumpForce;
+                        else if (keys.ArrowRight) player.vx = player.horizontalJumpForce;
+                        else player.vx = 0;
+
+                        player.grounded = false;
+                        player.charging = false;
+                        player.chargeLevel = 0;
+                    } else {
+                        // 일반 걷기
+                        if (keys.ArrowLeft) player.vx = -player.walkSpeed;
+                        else if (keys.ArrowRight) player.vx = player.walkSpeed;
+                        else player.vx = 0;
+                    }
+                }
+            } else {
+                // 공중 (제어 불가, 중력 적용)
+                player.vy += player.gravity;
+                if (player.vy > player.maxFallSpeed) player.vy = player.maxFallSpeed;
+                player.charging = false;
+                player.chargeLevel = 0;
+            }
+
+            // 2. X축 이동 및 충돌 체크 (분리축 정리)
+            player.x += player.vx;
+            
+            // 화면 양옆 벽 충돌 (튕김 효과)
+            if (player.x < 0) {
+                player.x = 0;
+                player.vx *= -player.bounceFactor; 
+            } else if (player.x + player.width > CANVAS_WIDTH) {
+                player.x = CANVAS_WIDTH - player.width;
+                player.vx *= -player.bounceFactor;
+            }
+
+            // 플랫폼 X축 충돌 (벽에 부딪힘)
+            for (let p of platforms) {
+                if (isColliding(player, p)) {
+                    if (player.vx > 0) { // 오른쪽으로 가다 왼쪽 벽 충돌
+                        player.x = p.x - player.width;
+                        player.vx *= -player.bounceFactor;
+                    } else if (player.vx < 0) { // 왼쪽으로 가다 오른쪽 벽 충돌
+                        player.x = p.x + p.w;
+                        player.vx *= -player.bounceFactor;
+                    }
+                }
+            }
+
+            // 3. Y축 이동 및 충돌 체크
+            player.y += player.vy;
+            player.grounded = false; // 매 프레임 초기화 후 충돌 시 true로 변경
+
+            for (let p of platforms) {
+                if (isColliding(player, p)) {
+                    if (player.vy > 0) { // 떨어지다가 위쪽 바닥 충돌
+                        player.y = p.y - player.height;
+                        player.vy = 0;
+                        player.vx = 0; // 착지 시 미끄러짐 방지 (완전 정지)
+                        player.grounded = true;
+                    } else if (player.vy < 0) { // 점프하다가 아래쪽 천장 충돌
+                        player.y = p.y + p.h;
+                        player.vy *= -0.5; // 천장에 부딪히면 아래로 튕김
+                    }
+                }
+            }
+
+            // 4. 카메라 스크롤 및 점수 계산
+            // 플레이어가 화면 중앙(CANVAS_HEIGHT * 0.6) 위로 올라가면 카메라를 올림
+            const targetCameraY = player.y - (CANVAS_HEIGHT * 0.6);
+            if (targetCameraY < cameraY) {
+                // 부드러운 카메라 이동
+                cameraY += (targetCameraY - cameraY) * 0.1;
+            }
+            // 바닥 밑으로 카메라가 내려가지 않게 고정
+            if (cameraY > 0) cameraY = 0;
+
+            // 점수 (높이) 계산 (시작점을 0으로)
+            let currentHeight = Math.floor((CANVAS_HEIGHT - 100 - player.y) / 10);
+            if (currentHeight < 0) currentHeight = 0;
+            
+            if (currentHeight > maxHeightReached) {
+                maxHeightReached = currentHeight;
+                if (maxHeightReached > highestScore) {
+                    highestScore = maxHeightReached;
+                }
+            }
+
+            heightDisplay.innerText = currentHeight;
+            highScoreDisplay.innerText = highestScore;
+        }
+
+        // AABB 충돌 체크 함수
+        function isColliding(rect1, rect2) {
+            return rect1.x < rect2.x + rect2.w &&
+                   rect1.x + rect1.width > rect2.x &&
+                   rect1.y < rect2.y + rect2.h &&
+                   rect1.y + rect1.height > rect2.y;
+        }
+
+        // --- 그리기 로직 ---
+        function draw() {
+            // 배경 그리기 (높이에 따라 색상 변화 효과)
+            let bgRatio = Math.min(1, Math.abs(cameraY) / 10000);
+            ctx.fillStyle = `rgb(${15 - bgRatio*15}, ${32 - bgRatio*32}, ${39 - bgRatio*20})`; // 올라갈수록 어두워짐
+            ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+            ctx.save();
+            ctx.translate(0, -cameraY); // 카메라 적용
+
+            // 플랫폼 그리기
+            for (let p of platforms) {
+                // 화면에 보이는 것만 그림 (최적화)
+                if (p.y > cameraY - 100 && p.y < cameraY + CANVAS_HEIGHT + 100) {
+                    if (p.type === 'ground') {
+                        ctx.fillStyle = '#4a69bd'; // 짙은 파란색 바닥
+                    } else if (p.type === 'wall') {
+                        ctx.fillStyle = '#636e72'; // 회색 벽
+                    } else {
+                        // 일반 플랫폼
+                        ctx.fillStyle = '#78e08f'; // 연두색 상단
+                        ctx.fillRect(p.x, p.y, p.w, p.h);
+                        ctx.fillStyle = '#38ada9'; // 짙은 녹색 하단 (입체감)
+                        ctx.fillRect(p.x, p.y + p.h - 5, p.w, 5);
+                        continue;
+                    }
+                    ctx.fillRect(p.x, p.y, p.w, p.h);
+                }
+            }
+
+            // 플레이어 그리기
+            ctx.fillStyle = player.color;
+            
+            // 충전 시 찌그러지는 애니메이션
+            let squish = 1;
+            let widthScale = 1;
+            if (player.charging) {
+                let ratio = player.chargeLevel / player.maxCharge;
+                squish = 1 - (ratio * 0.4); // 최대 40% 납작해짐
+                widthScale = 1 + (ratio * 0.2); // 옆으로 살짝 퍼짐
+            }
+
+            let drawW = player.width * widthScale;
+            let drawH = player.height * squish;
+            let drawX = player.x - (drawW - player.width) / 2;
+            let drawY = player.y + (player.height - drawH); // 바닥에 붙어있도록 보정
+
+            // 그림자
+            ctx.fillStyle = 'rgba(0,0,0,0.3)';
+            ctx.fillRect(drawX + 5, drawY + 5, drawW, drawH);
+
+            // 본체
+            ctx.fillStyle = player.color;
+            ctx.fillRect(drawX, drawY, drawW, drawH);
+            
+            // 눈 (방향에 따라)
+            ctx.fillStyle = 'white';
+            let eyeOffsetX = 0;
+            if (keys.ArrowRight && !player.charging && player.grounded) eyeOffsetX = 3;
+            else if (keys.ArrowLeft && !player.charging && player.grounded) eyeOffsetX = -3;
+            else if (player.vx > 0.5) eyeOffsetX = 3;
+            else if (player.vx < -0.5) eyeOffsetX = -3;
+
+            ctx.fillRect(drawX + 5 + eyeOffsetX, drawY + 5, 6, 6);
+            ctx.fillRect(drawX + drawW - 11 + eyeOffsetX, drawY + 5, 6, 6);
+            
+            ctx.fillStyle = 'black'; // 눈동자
+            ctx.fillRect(drawX + 7 + eyeOffsetX, drawY + 7, 2, 2);
+            ctx.fillRect(drawX + drawW - 9 + eyeOffsetX, drawY + 7, 2, 2);
+
+            // 충전 게이지 UI (캐릭터 위에 표시)
+            if (player.charging) {
+                let barW = 40;
+                let barH = 6;
+                let barX = player.x + (player.width / 2) - (barW / 2);
+                let barY = player.y - 15;
+
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                ctx.fillRect(barX, barY, barW, barH);
+                
+                let ratio = player.chargeLevel / player.maxCharge;
+                // 색상 변화: 초록 -> 노랑 -> 빨강
+                let r = Math.floor(255 * ratio);
+                let g = Math.floor(255 * (1 - ratio));
+                ctx.fillStyle = `rgb(${r}, ${g}, 0)`;
+                ctx.fillRect(barX, barY, barW * ratio, barH);
+            }
+
+            ctx.restore();
+        }
+
+        // --- 메인 게임 루프 ---
+        function loop() {
+            update();
+            draw();
+            if (gameState === 'PLAYING') {
+                animationId = requestAnimationFrame(loop);
+            }
+        }
+
+        // 초기 화면 그리기
+        ctx.fillStyle = '#1a1a2e';
+        ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+    </script>
+</body>
+</html>
