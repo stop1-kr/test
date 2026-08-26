@@ -231,7 +231,7 @@ footer{max-width:1000px;margin:0 auto;padding:24px 16px;color:var(--muted);font-
   <figure><img data-fig="fig2" alt="삼각측량망: 기선 하나에서 시작해 삼각형을 이어 붙여 에베레스트까지 연결"><figcaption>그림 2. 삼각측량망. 굵은 빨간 선 하나만 자로 직접 잰 값이고, 나머지는 모두 각도를 재어 삼각비로 계산한 값이다.</figcaption></figure>
 
   <div class="script">
-    <p>우리는 이제 AC 가 약 86.6 m 라는 것을 압니다. 그러면 <b>선분 AC 를 새로운 기선으로 쓸 수 있습니다.</b> C 옆의 또 다른 봉우리 D 를 향해 각을 두 번 재면 D 까지의 거리가 나오고, 다시 CD 를 기선으로 삼아 E 로, E 에서 F 로 삼각형이 옆으로 번져 나갑니다. 이것을 <b>삼각측량망</b>이라고 합니다.</p>
+    <p>우리는 이제 AC 가 약 86.6 m 라는 것을 압니다. 그러면 <b>선분 AC 를 새로운 기선으로 쓸 수 있습니다.</b> 옆의 또 다른 봉우리 를 향해 각을 두 번 재면 새로운 봉우리까지의 거리가 나오고, 다시 이 거리를 기선으로 삼아 옆으로, 옆으로 번져 나갑니다. 이것을 <b>삼각측량망</b>이라고 합니다.</p>
     <p>인도에서는 1802년부터 1871년까지 무려 70년 동안 이 작업을 했습니다. 인도 남쪽 끝에서 히말라야까지 삼각형을 이어 붙였고, 그 마지막 꼭짓점에서 봉우리를 올려다보며 각을 재어 에베레스트의 높이를 계산했습니다.</p>
     <p>우리나라 산 정상에서 볼 수 있는 작은 돌 표석, <b>삼각점</b>이 바로 이 삼각형의 꼭짓점입니다.</p>
   </div>
@@ -1031,10 +1031,10 @@ while True:
    GitHub Pages 에 이미지를 함께 올리려면 아래 주소를
    'images/fig1.png' 처럼 상대 경로로 바꾸면 됩니다.          */
 var IMAGES = {
-  fig1: "https://images.wrks.ai/dalle/oYW08y5xDxpLwTwpFwbAaVDIhRnjW5MEVjeRcZ3W.png",
-  fig2: "https://images.wrks.ai/dalle/dqtd8Al4wW7cmR7HH0g57gTVVHKIWgsbbjTvdKjK.png",
-  fig3: "https://images.wrks.ai/dalle/QFLuVnNVqeNNMpObeHIEvmvQbcN6XfPf5rWT2bkb.png",
-  fig4: "https://images.wrks.ai/dalle/WuzZfycfCcX9FyvYWcGPpcZqFhwf3JbL8BVAsIb9.png"
+  fig1: "images/fig1_triangulation.png",
+  fig2: "images/fig2_network.png",
+  fig3: "images/fig3_gps_trilateration.png",
+  fig4: "images/fig4_gps_four_satellites.png"
 };
 var imgs = document.querySelectorAll("img[data-fig]");
 for (var i = 0; i < imgs.length; i++) {
