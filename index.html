@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>삼각비의 활용 — 삼각측량과 GPS 학습지</title>
+<style>
+:root{--fg:#111827;--sub:#4b5563;--bd:#d1d5db;--pri:#1d4ed8;--bg:#ffffff;--soft:#f8fafc;--red:#dc2626;--ok:#15803d;--r:8px}
+*{box-sizing:border-box}
+body{margin:0;background:#f1f5f9;color:var(--fg);font-family:Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.75;font-size:16px}
+.wrap{max-width:1000px;margin:0 auto;padding:0 16px 80px}
+header.top{position:sticky;top:0;z-index:50;background:var(--bg);border-bottom:1px solid var(--bd)}
+.topin{max-width:1000px;margin:0 auto;padding:10px 16px}
+.tt{font-size:19px;font-weight:800;letter-spacing:-.3px}
+.tsub{font-size:13px;color:var(--sub);margin-top:2px}
+.idbar{display:grid;grid-template-columns:1fr 1fr auto auto;gap:8px;align-items:center;margin-top:10px}
+.idbar input{padding:9px 10px;border:1px solid var(--bd);border-radius:6px;font-size:15px;font-family:inherit;width:100%}
+.btn{padding:9px 16px;border:1px solid var(--bd);background:#fff;border-radius:6px;font-size:14px;font-family:inherit;cursor:pointer;white-space:nowrap}
+.btn:hover{background:#f3f4f6}
+.btn.pri{background:var(--pri);border-color:var(--pri);color:#fff}
+.btn.pri:hover{opacity:.9}
+.stat{font-size:13px;color:var(--sub);margin-top:6px;min-height:18px}
+.stat.ok{color:var(--ok)} .stat.err{color:var(--red)}
+.pbar{height:5px;background:#e5e7eb;border-radius:3px;overflow:hidden;margin-top:8px}
+.pbar>i{display:block;height:100%;width:0;background:var(--pri);transition:width .2s}
+nav.toc{background:#fff;border:1px solid var(--bd);border-radius:var(--r);padding:12px 14px;margin:16px 0}
+nav.toc b{font-size:13px;color:var(--sub);display:block;margin-bottom:6px}
+nav.toc a{display:inline-block;font-size:13px;color:var(--fg);text-decoration:none;border:1px solid var(--bd);border-radius:5px;padding:4px 9px;margin:3px 4px 3px 0}
+nav.toc a:hover{background:#eff6ff;border-color:var(--pri);color:var(--pri)}
+section{background:#fff;border:1px solid var(--bd);border-radius:var(--r);padding:20px 22px;margin:16px 0}
+h2{font-size:21px;margin:0 0 14px;letter-spacing:-.3px;padding-bottom:9px;border-bottom:2px solid var(--fg)}
+h2 .no{color:var(--pri);margin-right:8px;font-variant-numeric:tabular-nums}
+h3{font-size:16px;margin:20px 0 8px;color:var(--pri)}
+p{margin:9px 0}
+figure{margin:14px 0}
+figure img{width:100%;border:1px solid var(--bd);border-radius:6px;display:block}
+figcaption{font-size:12.5px;color:var(--sub);margin-top:5px}
+.say{border-left:3px solid var(--pri);background:var(--soft);padding:10px 14px;margin:10px 0;border-radius:0 6px 6px 0}
+.say .who{font-size:12px;color:var(--pri);font-weight:700;display:block;margin-bottom:3px}
+.note{border-left:3px solid #9ca3af;background:#f9fafb;padding:9px 13px;font-size:14px;color:var(--sub);margin:10px 0;border-radius:0 6px 6px 0}
+.board{background:#0f172a;color:#e2e8f0;border-radius:6px;padding:14px 18px;font-size:15px;line-height:2;white-space:pre-wrap;margin:12px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14.5px}
+th,td{border:1px solid var(--bd);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:#f3f4f6;font-weight:700}
+.qbox{border:1px solid var(--bd);border-radius:var(--r);padding:14px 16px;margin:16px 0;background:var(--soft)}
+.qbox h4{margin:0 0 10px;font-size:15px}
+ol.q{margin:0;padding-left:22px}
+ol.q>li{margin:9px 0}
+input.bl{border:none;border-bottom:2px solid var(--pri);background:#fff;font-family:inherit;font-size:15px;padding:2px 6px;min-width:80px;text-align:center;color:var(--pri);font-weight:700}
+input.bl:focus{outline:none;background:#eff6ff}
+input.bl.good{border-color:var(--ok);color:var(--ok);background:#f0fdf4}
+input.bl.bad{border-color:var(--red);color:var(--red);background:#fef2f2}
+.qfoot{margin-top:10px;display:flex;gap:8px;align-items:center}
+.qres{font-size:13px;color:var(--sub)}
+details{margin:12px 0;border:1px solid var(--bd);border-radius:6px;padding:8px 12px;background:#fff}
+summary{cursor:pointer;font-size:14px;font-weight:700;color:var(--sub)}
+pre.code{background:#0f172a;color:#e2e8f0;padding:14px;border-radius:6px;overflow:auto;max-height:420px;font-size:12.5px;line-height:1.55;font-family:"SFMono-Regular",Consolas,monospace;white-space:pre}
+.codebar{display:flex;gap:8px;align-items:center;margin:10px 0 6px;flex-wrap:wrap}
+a.lnk{color:var(--pri)}
+@media print{
+ header.top,nav.toc,.qfoot,.codebar,pre.code,details,.btn{display:none!important}
+ body{background:#fff} section{border:none;padding:0;margin:18px 0;break-inside:avoid}
+ input.bl{border-bottom:1px solid #000;color:#000}
+}
+@media (max-width:640px){.idbar{grid-template-columns:1fr 1fr}.wrap{padding:0 10px 60px}section{padding:16px 14px}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="topin">
+    <div class="tt">삼각비의 활용 — 삼각측량과 GPS</div>
+    <div class="tsub">중학교 3학년 · 그림을 보며 대본을 따라 읽고 빈칸을 채워 봅시다.</div>
+    <div class="idbar">
+      <input id="sid" type="text" placeholder="학번" autocomplete="off">
+      <input id="name" type="text" placeholder="이름" autocomplete="off">
+      <button id="btnLoad" class="btn">불러오기</button>
+      <button id="btnSave" class="btn pri">저장</button>
+    </div>
+    <div class="stat" id="stat"></div>
+    <div class="pbar"><i id="pb"></i></div>
+    <div class="tsub" id="pctxt" style="margin-top:4px"></div>
+  </div>
+</header>
+
+<div class="wrap">
+<nav class="toc"><b>차례</b><a href="#s1">01 갈 수 없는 곳</a><a href="#s2">02 저 섬까지 몇 m</a><a href="#s3">03 삼각비가 바다를 건넌다</a><a href="#s4">04 GPS는 거리를 잰다</a><a href="#s5">05 왜 위성이 4개일까</a><a href="#s6">06 내 위치를 어떻게 적을까</a><a href="#s7">07 지구를 굴려 보자</a><a href="#s8">08 오늘의 한 문장</a></nav>
+
+<section id="s1"><h2><span class="no">01</span>갈 수 없는 곳의 길이를 잰다</h2>
+<div class="board">8,848 m</div>
+<div class="say"><span class="who">선생님</span>이 숫자가 무엇일까요? 세계에서 가장 높은 산, 에베레스트의 높이입니다.
+그런데 정말 궁금한 건 이겁니다. <b>이걸 대체 누가, 어떻게 쟀을까요?</b></div>
+<p>줄자를 8,848 m 만들어서 정상에서 내려뜨렸을까요? 놀라운 사실이 하나 있습니다.
+이 산의 높이가 처음 계산된 것은 <b>1856년</b>입니다. 헬기도, 인공위성도, 심지어 그 산 정상에 사람이 올라가 본 적도 없던 시절이었습니다.
+인류가 에베레스트 정상을 처음 밟은 것은 그로부터 거의 100년 뒤인 1953년이었으니까요.</p>
+<div class="say"><span class="who">선생님</span>정상에 가보지도 않고, 산 아래 평지에서 높이를 알아냈다는 겁니다.
+오늘 여러분이 쓸 무기는 딱 하나예요. 지난 시간에 배운 <b>삼각비</b>. 그거 하나면 됩니다.</div>
+<div class="note">인도 대삼각측량(Great Trigonometrical Survey)은 1802년에 시작되어 1871년에 완료된 대규모 측량 사업이며,
+1856년에 에베레스트의 높이가 29,002피트(약 8,840 m)로 발표되었습니다.</div>
+<div class="qbox" data-q="q1"><h4>빈칸을 채워 봅시다</h4><ol class="q"><li>에베레스트의 높이가 처음 계산된 해는 <input class="bl" data-a="1856" style="min-width:80px"> 년이다.</li><li>인류가 에베레스트 정상을 처음 밟은 해는 <input class="bl" data-a="1953" style="min-width:80px"> 년이다.</li><li>오늘 우리가 쓸 무기는 <input class="bl" data-a="삼각비" style="min-width:110px"> 하나뿐이다.</li></ol><div class="qfoot"><button class="btn" onclick="check(this)">정답 확인</button><span class="qres"></span></div></div>
+</section>
+<section id="s2"><h2><span class="no">02</span>저 섬까지 몇 m일까</h2>
+<figure><img src="https://images.wrks.ai/dalle/oYW08y5xDxpLwTwpFwbAaVDIhRnjW5MEVjeRcZ3W.png" alt="삼각측량의 원리"><figcaption>그림 1. 해변의 두 지점 A, B에서 각을 재어 섬 C까지의 거리를 구한다.</figcaption></figure>
+<div class="say"><span class="who">선생님</span>여러분이 해변에 서 있습니다. 바다 한가운데 섬이 하나 보여요.
+여기서 저 섬까지 거리가 몇 m인지 알아내야 합니다. <b>단, 배도 없고 다리도 없고 헤엄쳐 갈 수도 없어요.</b>
+발이 땅에서 떨어지면 안 됩니다.</div>
+<p>여러분이 땅 위에서 직접 잴 수 있는 것은 딱 두 가지뿐입니다.
+하나는 해변을 따라 걸으면서 재는 <b>거리</b>, 다른 하나는 각도기로 재는 <b>각도</b>입니다.
+이 두 가지만 가지고 바다 건너 거리를 알아낼 수 있을까요? 놀랍게도, 됩니다.</p>
+<h3>측량의 첫 단계 — 기선을 잡는다</h3>
+<p>해변에 두 지점 A, B를 잡습니다. 이 두 점 사이의 거리는 걸어가면서 잴 수 있습니다. 재보니 100 m가 나왔습니다.
+A와 B를 잇는 이 선분을 측량에서는 <b>기선(基線, base line)</b>이라고 부릅니다.
+그다음 A에서 섬을 바라본 각을 재니 30°, B에서 재니 60°가 나왔습니다.</p>
+<div class="qbox" data-q="q2"><h4>빈칸을 채워 봅시다</h4><ol class="q"><li>땅 위에서 직접 잴 수 있는 두 가지는 <input class="bl" data-a="거리" style="min-width:90px"> 와(과) <input class="bl" data-a="각도" style="min-width:90px"> 이다.</li><li>A와 B를 잇는 기준이 되는 선분을 <input class="bl" data-a="기선|기선(base line)|base line" style="min-width:110px"> 이라고 부른다.</li><li>우리가 손에 넣은 세 숫자는 <input class="bl" data-a="100" style="min-width:70px"> m, <input class="bl" data-a="30" style="min-width:60px"> °, <input class="bl" data-a="60" style="min-width:60px"> ° 이다.</li></ol><div class="qfoot"><button class="btn" onclick="check(this)">정답 확인</button><span class="qres"></span></div></div>
+</section>
+<section id="s3"><h2><span class="no">03</span>삼각비가 대신 바다를 건넌다</h2>
+<figure><img src="https://images.wrks.ai/dalle/oYW08y5xDxpLwTwpFwbAaVDIhRnjW5MEVjeRcZ3W.png" alt="삼각측량의 원리"><figcaption>그림 1. 빨간 실선은 직접 잰 값, 파란 점선은 구해야 할 값이다.</figcaption></figure>
+<div class="say"><span class="who">선생님</span>삼각형 ABC에서 두 각을 알고 있으면, 나머지 한 각은 어떻게 구하죠?</div>
+<div class="board">∠C = 180° − 30° − 60° = 90°
+
+  → 삼각형 ABC는 ∠C = 90° 인 직각삼각형!
+  → 빗변은 AB = 100 m
+
+  ∠A = 30° 이므로   AC = 100 × cos 30° ≈ 86.6 m
+  ∠B = 60° 이므로   BC = 100 × cos 60° = 100 × (1/2) = 50 m</div>
+<div class="say"><span class="who">선생님</span>A 지점에서 섬까지는 약 86.6 m, B 지점에서 섬까지는 정확히 50 m.
+우리는 바닷물에 발 한 번 안 담그고 답을 알아냈어요.
+여기서 딱 하나만 기억하세요. <b>우리가 물을 건넌 게 아니라, 삼각비가 대신 건너간 겁니다.</b></div>
+<div class="note">cos 30°, cos 60° 의 값은 삼각비의 표 또는 특수각의 삼각비를 이용해 구합니다.
+계산기를 쓰지 않고도 표에서 값을 찾아 곱셈만 하면 됩니다.</div>
+
+<h3>이 방법을 한 번 더 하면, 나라 전체를 잰다</h3>
+<figure><img src="https://images.wrks.ai/dalle/dqtd8Al4wW7cmR7HH0g57gTVVHKIWgsbbjTvdKjK.png" alt="삼각측량망"><figcaption>그림 2. 굵은 빨간 선 하나만 자로 직접 잰 값이고, 나머지는 모두 계산으로 얻은 값이다.</figcaption></figure>
+<p>우리는 이제 A에서 C까지 약 86.6 m라는 것을 압니다. 그러면 <b>선분 AC를 새로운 기선으로 쓸 수 있습니다.</b>
+C 옆의 또 다른 지점 D를 향해 각을 두 번 재면 D까지의 거리가 나오고, CD를 다시 기선으로 삼아 E로, E에서 F로 이어집니다.
+이렇게 삼각형이 옆으로 번져 나가는 그물을 <b>삼각측량망</b>이라고 합니다.</p>
+<p>인도에서는 1802년부터 1871년까지 약 70년 동안 이 작업을 했습니다.
+인도 남쪽 끝에서 히말라야까지 삼각형을 이어 붙였고, 그 마지막 꼭짓점에서 히말라야 봉우리를 올려다보며 각을 쟀습니다.
+그렇게 에베레스트의 높이가 계산되었습니다.</p>
+<div class="note">우리나라 산 정상에 박혀 있는 작은 돌 표석 &lsquo;삼각점&rsquo;이 바로 이 삼각형의 꼭짓점입니다.</div>
+<div class="qbox" data-q="q3"><h4>빈칸을 채워 봅시다</h4><ol class="q"><li>∠C = 180° − 30° − 60° = <input class="bl" data-a="90" style="min-width:70px"> °</li><li>따라서 삼각형 ABC는 직각삼각형이고, 빗변은 <input class="bl" data-a="AB|AB=100|AB(100m)" style="min-width:90px"> 이다.</li><li>AC = 100 × cos 30° ≈ <input class="bl" data-a="86.6|86.60|86.6m" style="min-width:90px"> m</li><li>BC = 100 × cos 60° = 100 × <input class="bl" data-a="1/2|0.5" style="min-width:80px"> = <input class="bl" data-a="50" style="min-width:70px"> m</li><li>그림 2의 삼각측량망에서 자로 직접 잰 선분은 모두 <input class="bl" data-a="1|1개|한개|하나" style="min-width:70px"> 개다.</li><li>우리가 물을 건넌 것이 아니라 <input class="bl" data-a="삼각비" style="min-width:100px"> 가(이) 대신 건너간 것이다.</li></ol><div class="qfoot"><button class="btn" onclick="check(this)">정답 확인</button><span class="qres"></span></div></div>
+</section>
+<section id="s4"><h2><span class="no">04</span>GPS는 각도가 아니라 거리를 잰다</h2>
+<div class="say"><span class="who">선생님</span>주머니 속 스마트폰을 꺼내 봅시다. 지도 앱을 켜면 파란 점이 딱 내 위치를 찍어 주죠?
+여기서 질문. <b>여러분 스마트폰에 각도기가 들어 있나요?</b></div>
+<p>없습니다. 스마트폰이 하늘을 올려다보며 &lsquo;저 위성이 37도쯤 되나&rsquo; 하고 각을 재지 않아요.
+그런데도 내 위치를 몇 m 오차로 알아냅니다. GPS는 <b>각도 대신 거리를 잽니다.</b></p>
+<figure><img src="https://images.wrks.ai/dalle/QFLuVnNVqeNNMpObeHIEvmvQbcN6XfPf5rWT2bkb.png" alt="GPS 삼변측량"><figcaption>그림 3. 위성이 하나씩 늘어날 때마다 내 위치의 후보가 좁혀진다.</figcaption></figure>
+<table>
+<tr><th style="width:110px">위성 수</th><th>위성이 알려 주는 것</th><th>내 위치의 후보</th></tr>
+<tr><td>1개</td><td>&ldquo;나로부터 20,100 km 떨어진 곳에 네가 있어&rdquo;</td><td>그 거리만큼 떨어진 곳 전부 — 무수히 많다</td></tr>
+<tr><td>2개</td><td>거리 2개</td><td>두 원이 만나는 점 2곳</td></tr>
+<tr><td>3개</td><td>거리 3개</td><td>세 원이 만나는 단 한 점 — 확정</td></tr>
+</table>
+<p>이렇게 거리 세 개로 위치를 찾는 방법을 <b>삼변측량(三邊測量)</b>이라고 합니다.
+삼각측량이 &lsquo;세 각&rsquo;이라면, 삼변측량은 &lsquo;세 변&rsquo;, 즉 거리 세 개로 위치를 찾는 방법입니다.</p>
+<div class="note">많은 사람들이 &lsquo;GPS는 삼각측량이다&rsquo;라고 말하지만, 엄밀히 말하면 GPS는 각을 재지 않으므로 삼변측량입니다.
+그래도 둘을 함께 배우는 이유는 발상이 똑같기 때문입니다. 직접 갈 수 없는 곳까지의 거리를 도형의 성질로 계산해 낸다는 점에서요.</div>
+
+<h3>우주에서 직접 확인해 보자 — Web VPython 시뮬레이션</h3>
+<p>아래 코드를 실행하면 지구와 GPS 위성 4개가 나타납니다.
+버튼으로 위성을 1개 → 2개 → 3개 → 4개로 늘려 가며, 내 위치의 후보가 어떻게 좁혀지는지 눈으로 확인할 수 있습니다.</p>
+
+<div class="codebar">
+  <b style="font-size:14px">자료 B · GPS 삼변측량 시뮬레이션</b>
+  <button class="btn" onclick="copyCode('codeB',this)">코드 복사</button>
+  <button class="btn" onclick="downCode('codeB','gps_trilateration_webvpython.py')">.py 파일로 저장</button>
+  <a class="btn" href="https://trinket.io/glowscript" target="_blank" rel="noopener">로그인 없이 실행 (Trinket)</a>
+  <a class="btn" href="https://www.glowscript.org/" target="_blank" rel="noopener">Web VPython 공식</a>
+</div>
+<p style="font-size:13.5px;color:#4b5563;margin:2px 0 8px">실행 후 마우스로 드래그하면 지구를 돌려 볼 수 있고, 마우스 휠로 확대·축소할 수 있습니다. 위성 3개일 때 나타나는 흰 점 2개 중 하나가 지구 밖에 있다는 점을 꼭 확인해 보세요.</p>
+<pre class="code" id="codeB"></pre>
+<div class="qbox" data-q="q4"><h4>빈칸을 채워 봅시다</h4><ol class="q"><li>위성 1개일 때, 내 위치의 후보는 <input class="bl" data-a="무수히 많다|무수히많다|매우 많다" style="min-width:130px"> .</li><li>위성 2개일 때, 두 원이 만나는 점은 <input class="bl" data-a="2|2개|두개|둘" style="min-width:70px"> 개다.</li><li>위성 3개일 때, 세 원은 <input class="bl" data-a="한|1|하나" style="min-width:60px"> 점에서 만난다.</li><li>거리 세 개로 위치를 찾는 이 방법을 <input class="bl" data-a="삼변측량|삼변 측량" style="min-width:110px"> 이라고 한다.</li><li>스마트폰에는 각도기가 <input class="bl" data-a="없다|없음" style="min-width:80px"> . GPS가 재는 것은 각도가 아니라 <input class="bl" data-a="거리" style="min-width:80px"> 다.</li></ol><div class="qfoot"><button class="btn" onclick="check(this)">정답 확인</button><span class="qres"></span></div></div>
+</section>
+<section id="s5"><h2><span class="no">05</span>거리는 어떻게 재고, 왜 위성이 4개일까</h2>
+<figure><img src="https://images.wrks.ai/dalle/WuzZfycfCcX9FyvYWcGPpcZqFhwf3JbL8BVAsIb9.png" alt="GPS 거리 측정과 위성 4개의 이유"><figcaption>그림 4. 빨간 칸의 계산은 직접 해 봅시다.</figcaption></figure>
+<h3>거리 = 속력 × 시간</h3>
+<p>스마트폰이 위성까지의 거리를 어떻게 잴까요? 줄자를 우주로 던질 수는 없습니다. 답은 <b>시간</b>입니다.
+위성이 전파를 쏘면서 &lsquo;지금 시각은 몇 시 몇 분 몇 초&rsquo;라고 함께 실어 보냅니다.
+스마트폰이 그 신호를 받으면서 자기 시계를 봅니다. 그 차이가 신호가 날아온 시간입니다.</p>
+<p>전파는 빛의 속도, 초속 30만 km로 갑니다. GPS 위성은 지상 약 20,200 km 상공에 있고,
+신호가 오는 데 걸리는 시간은 대략 0.067초입니다.</p>
+<h3>그런데 스마트폰 시계는 정확하지 않다</h3>
+<p>위성에는 수십만 년에 1초 틀릴까 말까 한 원자시계가 실려 있지만, 스마트폰에는 그런 시계가 없습니다.
+시계가 아주 조금만 틀려도 거리는 얼마나 어긋날까요? 100만분의 1초, 즉 0.000001초만 틀렸다고 하고 직접 계산해 봅시다.</p>
+<div class="say"><span class="who">선생님</span>100만분의 1초 틀렸을 뿐인데 이만큼 어긋납니다.
+학교에서 출발했는데 지도에는 옆 동네에 있다고 뜨는 거예요.</div>
+<h3>그래서 위성이 최소 4개</h3>
+<p>GPS는 시계 오차까지 모르는 값으로 놓고 함께 구합니다.
+모르는 값은 가로(x), 세로(y), 높이(z), 그리고 시계 오차. 모두 4개입니다.
+미지수가 4개이면 식이 4개 필요하고, 식 하나를 위성 하나가 만들어 주므로 <b>위성이 최소 4개</b> 필요합니다.</p>
+<div class="qbox" data-q="q5"><h4>빈칸을 채워 봅시다</h4><ol class="q"><li>거리 = <input class="bl" data-a="속력|속도" style="min-width:80px"> × <input class="bl" data-a="시간" style="min-width:70px"></li><li>전파의 속력은 초속 약 <input class="bl" data-a="300000|30만|300,000" style="min-width:110px"> km 이다.</li><li>위성까지의 거리 = 300,000 km/초 × 0.067초 ≈ <input class="bl" data-a="20100|20,100|약 20100" style="min-width:110px"> km</li><li>시계가 0.000001초 틀리면 오차 = 300,000 × 0.000001 = <input class="bl" data-a="0.3" style="min-width:70px"> km = <input class="bl" data-a="300" style="min-width:70px"> m</li><li>모르는 값은 x, y, z 와 <input class="bl" data-a="시계 오차|시계오차|시간 오차" style="min-width:120px"> 까지 모두 <input class="bl" data-a="4|4개|네개" style="min-width:60px"> 개다.</li><li>그래서 위성이 최소 <input class="bl" data-a="4|4개|네개" style="min-width:60px"> 개 필요하다.</li></ol><div class="qfoot"><button class="btn" onclick="check(this)">정답 확인</button><span class="qres"></span></div></div>
+</section>
+<section id="s6"><h2><span class="no">06</span>내 위치가 정해졌다 — 그 위치를 어떻게 적을까</h2>
+<div class="say"><span class="who">선생님</span>GPS가 드디어 내 위치를 찾았습니다. 그런데 그 위치를 어떻게 적어 둘까요?
+공간 위의 한 점이니까 <b>x, y, z 세 개의 숫자</b>가 필요하겠죠.
+지구 중심을 원점으로 잡으면 서울은 대략 (−3038, 4034, 3888) km 입니다. 외울 수 있겠어요?</div>
+<p>그런데 여기에 중요한 사실이 하나 있습니다.
+우리는 <b>지구 표면 위</b>에 서 있습니다. 지구 중심에서 우리까지의 거리는 항상 지구 반지름 약 6,371 km 로 똑같습니다.
+그래서 세 숫자 x, y, z 가 완전히 자유로운 것이 아닙니다. 이미 하나가 정해져 있는 셈이죠.</p>
+<p>그래서 실제로 필요한 값은 <b>두 개</b>뿐입니다. 그 두 개를 각도로 잡은 것이 <b>구면좌표계</b>입니다.
+우리가 매일 쓰는 위도와 경도가 바로 그것입니다.</p>
+<table>
+<tr><th style="width:130px">기호</th><th style="width:150px">이름</th><th>뜻</th><th style="width:190px">서울의 경우</th></tr>
+<tr><td>R</td><td>반지름</td><td>지구 중심에서 그 점까지의 거리. 지표면 위에서는 항상 같다.</td><td>약 6,371 km</td></tr>
+<tr><td>θ (세타)</td><td>천정각</td><td>북극 방향(+z축)에서 잰 각. 북극 0°, 적도 90°, 남극 180°</td><td>90° − 37.6° = 약 52.4°</td></tr>
+<tr><td>φ (파이)</td><td>방위각</td><td>본초자오선에서 동쪽으로 잰 각. 경도와 같다.</td><td>약 127.0° (동경 127°)</td></tr>
+</table>
+<div class="note">숫자 세 개 (x, y, z) 대신, 각 두 개 (θ, φ) 만으로 지구 위의 모든 위치를 나타낼 수 있습니다.
+지도에 &lsquo;북위 37.6°, 동경 127.0°&rsquo; 라고만 적혀 있는 이유가 바로 이것입니다.</div>
+<div class="qbox" data-q="q6"><h4>빈칸을 채워 봅시다</h4><ol class="q"><li>지구 표면 위의 점은 지구 중심까지의 거리 R 이 항상 약 <input class="bl" data-a="6371|6,371" style="min-width:100px"> km 로 같다.</li><li>그래서 위치를 나타내는 데 실제로 필요한 값은 <input class="bl" data-a="2|2개|두개|둘" style="min-width:60px"> 개뿐이고, 이때 쓰는 좌표를 <input class="bl" data-a="구면좌표계|구면 좌표계|구면좌표" style="min-width:130px"> 라고 한다.</li></ol><div class="qfoot"><button class="btn" onclick="check(this)">정답 확인</button><span class="qres"></span></div></div>
+</section>
+<section id="s7"><h2><span class="no">07</span>지구를 굴려 보자 — Web VPython</h2>
+<p>아래 코드를 실행하면 지구가 나타나고, 슬라이더로 천정각 θ 와 방위각 φ 를 바꾸며
+지구 위의 점 P 가 어디로 가는지 직접 확인할 수 있습니다. 마우스로 드래그하면 지구를 이리저리 굴려 볼 수 있습니다.</p>
+
+<div class="codebar">
+  <b style="font-size:14px">자료 A · 구면좌표계 시뮬레이션</b>
+  <button class="btn" onclick="copyCode('codeA',this)">코드 복사</button>
+  <button class="btn" onclick="downCode('codeA','spherical_coords_webvpython.py')">.py 파일로 저장</button>
+  <a class="btn" href="https://trinket.io/glowscript" target="_blank" rel="noopener">로그인 없이 실행 (Trinket)</a>
+  <a class="btn" href="https://www.glowscript.org/" target="_blank" rel="noopener">Web VPython 공식</a>
+</div>
+<p style="font-size:13.5px;color:#4b5563;margin:2px 0 8px">북극이 화면 위쪽(+z축)에 오도록 맞추어 두었습니다. 지구 그림과 도시 표시가 어긋나 보이면 &lsquo;지구 그림 경도 맞추기&rsquo; 슬라이더로 조절하세요.</p>
+<pre class="code" id="codeA"></pre>
+<h3>이렇게 조작해 봅시다</h3>
+<table>
+<tr><th style="width:200px">해 볼 것</th><th>확인할 것</th></tr>
+<tr><td>θ 슬라이더만 움직이기</td><td>점 P 가 같은 경도선을 따라 북극에서 남극으로 오르내린다.</td></tr>
+<tr><td>φ 슬라이더만 움직이기</td><td>점 P 가 같은 위도선을 따라 동서로 돈다. 이때 높이(z)는 변하지 않는다.</td></tr>
+<tr><td>&lsquo;서울&rsquo; 버튼</td><td>θ ≈ 52.4°, φ ≈ 127.0° 로 맞춰지고, 점 P 가 한반도 위에 놓인다.</td></tr>
+<tr><td>&lsquo;시드니&rsquo; 버튼</td><td>θ ≈ 123.9° 로, 적도(90°)보다 큰 값이 된다.</td></tr>
+<tr><td>&lsquo;북극&rsquo; 버튼</td><td>θ = 0° 이면 φ 를 아무리 바꿔도 점 P 가 움직이지 않는다.</td></tr>
+</table>
+<div class="qbox" data-q="q7"><h4>빈칸을 채워 봅시다</h4><ol class="q"><li>θ = 0° 이면 점 P 는 <input class="bl" data-a="북극" style="min-width:80px"> 에 있다.</li><li>φ 만 움직이면 점 P 의 높이(z 값)는 <input class="bl" data-a="변하지 않는다|변하지않는다|일정하다|그대로다" style="min-width:150px"> .</li><li>서울은 북위 37.6° 이므로 θ = 90° − 37.6° = <input class="bl" data-a="52.4|52.43" style="min-width:80px"> °</li><li>적도 위에 있는 점의 천정각은 θ = <input class="bl" data-a="90" style="min-width:60px"> ° 이다.</li><li>시드니의 천정각 θ 는 90° 보다 <input class="bl" data-a="크다" style="min-width:70px"> .</li></ol><div class="qfoot"><button class="btn" onclick="check(this)">정답 확인</button><span class="qres"></span></div></div>
+</section>
+<section id="s8"><h2><span class="no">08</span>오늘의 한 문장</h2>
+<div class="board">삼각비는, 갈 수 없는 곳을 재는 자(尺)이다.</div>
+<div class="say"><span class="who">선생님</span>바다 건너 섬, 오를 수 없는 산꼭대기, 2만 km 위의 인공위성.
+인류는 이 모든 걸 <b>가보지 않고</b> 알아냈습니다. 손에 들고 있던 건 각도기 하나와 삼각비뿐이었어요.
+오늘 아침 지도 앱을 켰을 때 파란 점이 정확히 여러분 위에 찍힌 것도 같은 이유입니다.</div>
+<div class="qbox" data-q="q8"><h4>빈칸을 채워 봅시다</h4><ol class="q"><li>삼각비는 <input class="bl" data-a="갈 수 없는 곳|갈수없는곳|가지 못하는 곳" style="min-width:150px"> 을 재는 자이다.</li></ol><div class="qfoot"><button class="btn" onclick="check(this)">정답 확인</button><span class="qres"></span></div></div>
+</section>
+<p style="font-size:12.5px;color:#6b7280;text-align:left;margin-top:24px">
+입력한 내용은 이 브라우저에도 자동으로 임시 저장됩니다. 수업이 끝나면 위쪽 <b>저장</b> 버튼을 눌러 제출해 주세요.
+</p>
+</div>
+
+<script type="text/plain" id="srcA">Web VPython 3.2
+# ===========================================================
+#  [자료 A] 구면좌표계 - 지구 위의 한 점을 각 2개로 나타내기
+#  중학교 3학년 &lt;삼각비의 활용&gt; 수업용
+#  -----------------------------------------------------------
+#   * 북극이 +z 축(화면 위쪽)에 오도록 맞추었습니다.
+#   * theta(천정각) : 북극에서 잰 각        0도 ~ 180도
+#   * phi(방위각)   : 본초자오선에서 동쪽   0도 ~ 360도
+#   * 위도 = 90 - theta ,  경도 = phi
+# ===========================================================
+
+R_KM = 6371.0     # 실제 지구 반지름(km)
+Rd   = 6.0        # 화면에 그릴 반지름
+
+USE_TEXTURE    = True   # False 로 두면 지구 그림 없이 격자만 표시
+TEX_LON_OFFSET = 0      # 지구 그림 경도 보정(도) - 아래 슬라이더로도 조절
+
+scene = canvas(title=&#x27;&#x27;, width=900, height=540,
+               background=color.gray(0.06),
+               center=vec(0, 0, 0), range=9.8)
+scene.up      = vec(0, 0, 1)
+scene.forward = vec(-0.72, -0.46, -0.50)
+
+def rad(d):
+    return d * pi / 180.0
+
+def fmt(x, n):
+    m = 10 ** n
+    return str(round(x * m) / m)
+
+# -----------------------------------------------------------
+# 1. 지구  (북극을 +z 축으로 세운다)
+# -----------------------------------------------------------
+if USE_TEXTURE:
+    earth = sphere(pos=vec(0,0,0), radius=Rd, texture=textures.earth,
+                   opacity=0.62, shininess=0)
+else:
+    earth = sphere(pos=vec(0,0,0), radius=Rd, color=vec(0.12,0.36,0.78),
+                   opacity=0.50, shininess=0)
+
+# 지구 그림(텍스처)의 북극은 원래 +y 축에 놓인다.
+# x축을 중심으로 90도 돌려서 북극을 +z 축으로 옮긴다.  &lt;-- 핵심 한 줄
+earth.rotate(angle=pi/2, axis=vec(1,0,0), origin=vec(0,0,0))
+
+tex_now = 0.0
+if TEX_LON_OFFSET != 0:
+    earth.rotate(angle=rad(TEX_LON_OFFSET), axis=vec(0,0,1), origin=vec(0,0,0))
+    tex_now = TEX_LON_OFFSET
+
+# -----------------------------------------------------------
+# 2. 좌표축
+# -----------------------------------------------------------
+L = Rd * 1.5
+ac = color.gray(0.75)
+arrow(pos=vec(0,0,0), axis=vec(L,0,0), shaftwidth=0.05, color=ac)
+arrow(pos=vec(0,0,0), axis=vec(0,L,0), shaftwidth=0.05, color=ac)
+arrow(pos=vec(0,0,0), axis=vec(0,0,L), shaftwidth=0.05, color=ac)
+label(pos=vec(L+0.4,0,0), text=&#x27;x&#x27;, color=ac, box=False, opacity=0, height=16)
+label(pos=vec(0,L+0.4,0), text=&#x27;y&#x27;, color=ac, box=False, opacity=0, height=16)
+label(pos=vec(0,0,L+0.5), text=&#x27;z (북극)&#x27;, color=ac, box=False, opacity=0, height=16)
+
+# -----------------------------------------------------------
+# 3. 위도선 / 경도선
+# -----------------------------------------------------------
+def latitude_line(lat_deg, col, rr, op):
+    th = rad(90.0 - lat_deg)
+    c = curve(color=col, radius=rr, opacity=op)
+    k = 0
+    while k &lt;= 72:
+        ph = rad(k * 5.0)
+        c.append(vec(Rd*sin(th)*cos(ph), Rd*sin(th)*sin(ph), Rd*cos(th)))
+        k = k + 1
+
+def longitude_line(lon_deg, col, rr, op):
+    ph = rad(lon_deg)
+    c = curve(color=col, radius=rr, opacity=op)
+    k = 0
+    while k &lt;= 36:
+        th = rad(k * 5.0)
+        c.append(vec(Rd*sin(th)*cos(ph), Rd*sin(th)*sin(ph), Rd*cos(th)))
+        k = k + 1
+
+gc = color.gray(0.6)
+lat = -60
+while lat &lt;= 60:
+    if lat != 0:
+        latitude_line(lat, gc, 0.012, 0.45)
+    lat = lat + 30
+
+lon = 30
+while lon &lt; 360:
+    longitude_line(lon, gc, 0.012, 0.45)
+    lon = lon + 30
+
+latitude_line(0, color.yellow, 0.03, 0.9)      # 적도
+longitude_line(0, color.orange, 0.03, 0.9)     # 본초자오선
+
+# -----------------------------------------------------------
+# 4. 도시 표시 (지구 그림이 잘 맞았는지 눈으로 확인)
+# -----------------------------------------------------------
+def surface_pos(lat_deg, lon_deg, scale):
+    th = rad(90.0 - lat_deg)
+    ph = rad(lon_deg)
+    return vec(Rd*scale*sin(th)*cos(ph), Rd*scale*sin(th)*sin(ph), Rd*scale*cos(th))
+
+city_name = [&#x27;서울&#x27;, &#x27;시드니&#x27;, &#x27;그리니치&#x27;, &#x27;뉴욕&#x27;]
+city_lat  = [37.57, -33.87, 51.48, 40.71]
+city_lon  = [126.98, 151.21, 0.0, -74.01]
+
+i = 0
+while i &lt; len(city_name):
+    sphere(pos=surface_pos(city_lat[i], city_lon[i], 1.0), radius=0.11,
+           color=color.white, emissive=True)
+    label(pos=surface_pos(city_lat[i], city_lon[i], 1.10), text=city_name[i],
+          color=color.white, box=False, opacity=0, height=12)
+    i = i + 1
+
+# -----------------------------------------------------------
+# 5. 점 P 와 보조선 / 각의 호
+# -----------------------------------------------------------
+Pc  = color.red
+Pt  = sphere(pos=vec(Rd,0,0), radius=0.17, color=Pc, emissive=True)
+OP  = cylinder(pos=vec(0,0,0), axis=vec(Rd,0,0), radius=0.04, color=Pc)
+Pp  = sphere(pos=vec(Rd,0,0), radius=0.10, color=color.white, emissive=True)
+cOP = curve(color=color.white, radius=0.025)     # O  -&gt; P&#x27;
+cPP = curve(color=color.white, radius=0.025)     # P&#x27; -&gt; P
+lbP  = label(pos=vec(Rd,0,0), text=&#x27;P&#x27;, color=Pc, box=False, opacity=0,
+             height=17, xoffset=15, yoffset=15)
+lbPp = label(pos=vec(Rd,0,0), text=&quot;P&#x27;&quot;, color=color.white, box=False, opacity=0,
+             height=14, xoffset=12, yoffset=-15)
+
+arcT = curve(color=color.cyan,  radius=0.055)
+arcP = curve(color=color.green, radius=0.055)
+lbT  = label(text=&#x27;θ&#x27;, color=color.cyan,  box=False, opacity=0, height=18)
+lbF  = label(text=&#x27;φ&#x27;, color=color.green, box=False, opacity=0, height=18)
+
+# -----------------------------------------------------------
+# 6. 갱신 함수
+# -----------------------------------------------------------
+spin = False
+
+def update(w=None):
+    th = rad(sl_th.value)
+    ph = rad(sl_ph.value)
+    st = sin(th)
+    ct = cos(th)
+    sp = sin(ph)
+    cp = cos(ph)
+
+    P     = vec(Rd*st*cp, Rd*st*sp, Rd*ct)
+    Pfoot = vec(P.x, P.y, 0)
+
+    Pt.pos  = P
+    OP.axis = P
+    Pp.pos  = Pfoot
+    lbP.pos  = P
+    lbPp.pos = Pfoot
+
+    cOP.clear()
+    cOP.append(vec(0,0,0))
+    cOP.append(Pfoot)
+    cPP.clear()
+    cPP.append(Pfoot)
+    cPP.append(P)
+
+    # 천정각 호 (z축 -&gt; OP)
+    rT = Rd * 0.55
+    arcT.clear()
+    k = 0
+    n = 40
+    while k &lt;= n:
+        a = th * k / n
+        arcT.append(vec(rT*sin(a)*cp, rT*sin(a)*sp, rT*cos(a)))
+        k = k + 1
+    am = th * 0.55
+    lbT.pos = vec(rT*1.16*sin(am)*cp, rT*1.16*sin(am)*sp, rT*1.16*cos(am))
+
+    # 방위각 호 (x축 -&gt; OP&#x27;)
+    rP = Rd * 0.80
+    arcP.clear()
+    k = 0
+    while k &lt;= n:
+        a = ph * k / n
+        arcP.append(vec(rP*cos(a), rP*sin(a), 0))
+        k = k + 1
+    am2 = ph * 0.5
+    lbF.pos = vec(rP*1.14*cos(am2), rP*1.14*sin(am2), 0)
+
+    # 숫자판
+    lat_v = 90.0 - sl_th.value
+    lon_v = sl_ph.value
+    if lon_v &gt; 180:
+        lon_v = lon_v - 360.0
+    ns = &#x27;북위 &#x27;
+    if lat_v &lt; 0:
+        ns = &#x27;남위 &#x27;
+    ew = &#x27;동경 &#x27;
+    if lon_v &lt; 0:
+        ew = &#x27;서경 &#x27;
+
+    wt_th.text = fmt(sl_th.value, 1)
+    wt_ph.text = fmt(sl_ph.value, 1)
+    wt_tex.text = fmt(sl_tex.value, 0)
+
+    s1 = &#x27;  구면좌표  :  R = 6371 km ,  θ = &#x27; + fmt(sl_th.value,1) + &#x27;° ,  φ = &#x27; + fmt(sl_ph.value,1) + &#x27;°&#x27;
+    s2 = &#x27;  직교좌표  :  x = &#x27; + fmt(R_KM*st*cp,0) + &#x27; km ,  y = &#x27; + fmt(R_KM*st*sp,0) + &#x27; km ,  z = &#x27; + fmt(R_KM*ct,0) + &#x27; km&#x27;
+    s3 = &#x27;  지도 표기  :  &#x27; + ns + fmt(abs(lat_v),1) + &#x27;° ,  &#x27; + ew + fmt(abs(lon_v),1) + &#x27;°&#x27;
+    out.text = &#x27;\n&#x27; + s1 + &#x27;\n&#x27; + s2 + &#x27;\n&#x27; + s3 + &#x27;\n&#x27;
+
+def fix_tex(s):
+    global tex_now
+    d = s.value - tex_now
+    earth.rotate(angle=rad(d), axis=vec(0,0,1), origin=vec(0,0,0))
+    tex_now = s.value
+    update()
+
+def go(th_v, ph_v):
+    sl_th.value = th_v
+    sl_ph.value = ph_v
+    update()
+
+def go_seoul(b):
+    go(90.0-37.57, 126.98)
+
+def go_sydney(b):
+    go(90.0+33.87, 151.21)
+
+def go_zero(b):
+    go(90.0, 0.0)
+
+def go_pole(b):
+    go(0.0, 0.0)
+
+def set_spin(c):
+    global spin
+    spin = c.checked
+
+# -----------------------------------------------------------
+# 7. 조작판
+# -----------------------------------------------------------
+scene.append_to_caption(&#x27;\n&#x27;)
+sl_th = slider(min=0, max=180, value=90.0-37.57, step=0.1, length=380, bind=update)
+scene.append_to_caption(&#x27;  천정각 θ = &#x27;)
+wt_th = wtext(text=&#x27;&#x27;)
+scene.append_to_caption(&#x27;°   (북극 0° · 적도 90° · 남극 180°)\n\n&#x27;)
+
+sl_ph = slider(min=0, max=360, value=126.98, step=0.1, length=380, bind=update)
+scene.append_to_caption(&#x27;  방위각 φ = &#x27;)
+wt_ph = wtext(text=&#x27;&#x27;)
+scene.append_to_caption(&#x27;°   (본초자오선에서 동쪽으로 잰 각)\n\n&#x27;)
+
+sl_tex = slider(min=-180, max=180, value=TEX_LON_OFFSET, step=1, length=250, bind=fix_tex)
+scene.append_to_caption(&#x27;  지구 그림 경도 맞추기 = &#x27;)
+wt_tex = wtext(text=&#x27;&#x27;)
+scene.append_to_caption(&#x27;°   (도시 표시와 어긋나면 이 값을 조절)\n\n&#x27;)
+
+scene.append_to_caption(&#x27;  &#x27;)
+button(text=&#x27; 서울 &#x27;, bind=go_seoul)
+scene.append_to_caption(&#x27; &#x27;)
+button(text=&#x27; 시드니 &#x27;, bind=go_sydney)
+scene.append_to_caption(&#x27; &#x27;)
+button(text=&#x27; 적도 · 본초자오선 &#x27;, bind=go_zero)
+scene.append_to_caption(&#x27; &#x27;)
+button(text=&#x27; 북극 &#x27;, bind=go_pole)
+scene.append_to_caption(&#x27;    &#x27;)
+cb_spin = checkbox(text=&#x27; 자전 (φ 만 증가)&#x27;, checked=False, bind=set_spin)
+scene.append_to_caption(&#x27;\n&#x27;)
+
+out = wtext(text=&#x27;&#x27;)
+update()
+
+# -----------------------------------------------------------
+# 8. 실행 루프
+# -----------------------------------------------------------
+while True:
+    rate(60)
+    if spin:
+        v = sl_ph.value + 0.5
+        if v &gt;= 360:
+            v = v - 360
+        sl_ph.value = v
+        update()
+</script>
+<script type="text/plain" id="srcB">Web VPython 3.2
+# ===========================================================
+#  [자료 B] GPS 삼변측량 - 거리 3개로 내 위치를 찾는다
+#  중학교 3학년 &lt;삼각비의 활용&gt; 수업용
+#  -----------------------------------------------------------
+#   위성 1개 -&gt; 후보가 구면 전체 (무수히 많다)
+#   위성 2개 -&gt; 후보가 원 하나
+#   위성 3개 -&gt; 후보가 점 2개
+#   위성 4개 -&gt; 위치 + 시계 오차까지 확정
+#   * 아래 버튼으로 위성을 하나씩 늘려 가며 보여 주세요.
+# ===========================================================
+
+Re    = 2.4        # 지구 반지름(화면)
+Rsat  = 10.0       # 위성 궤도 반지름(화면) - 실제 비율(약 4.2배)에 맞춤
+Re_KM = 6371.0     # 실제 지구 반지름(km)
+
+scene = canvas(title=&#x27;&#x27;, width=900, height=560,
+               background=vec(0.03, 0.03, 0.08),
+               center=vec(0,0,0), range=13.0)
+scene.up      = vec(0, 0, 1)
+scene.forward = vec(-0.70, -0.50, -0.45)
+
+def rad(d):
+    return d * pi / 180.0
+
+def fmt(x, n):
+    m = 10 ** n
+    return str(round(x * m) / m)
+
+def sph_pos(r, lat_deg, lon_deg):
+    th = rad(90.0 - lat_deg)
+    ph = rad(lon_deg)
+    return vec(r*sin(th)*cos(ph), r*sin(th)*sin(ph), r*cos(th))
+
+# -----------------------------------------------------------
+# 1. 지구  (지구 그림을 입히고 북극을 +z 축으로)
+# -----------------------------------------------------------
+earth = sphere(pos=vec(0,0,0), radius=Re, texture=textures.earth,
+               shininess=0, opacity=1.0)
+earth.rotate(angle=pi/2, axis=vec(1,0,0), origin=vec(0,0,0))   # 북극을 z축으로
+TEX_LON_OFFSET = 0
+if TEX_LON_OFFSET != 0:
+    earth.rotate(angle=rad(TEX_LON_OFFSET), axis=vec(0,0,1), origin=vec(0,0,0))
+
+label(pos=vec(0,0,-Re-0.55), text=&#x27;지구&#x27;, color=color.cyan,
+      box=False, opacity=0, height=13)
+
+# -----------------------------------------------------------
+# 2. 수신기(내 스마트폰) - 지구 표면 위, 서울
+# -----------------------------------------------------------
+rx_lat = 37.57
+rx_lon = 126.98
+receiver_pos = sph_pos(Re, rx_lat, rx_lon)
+receiver = sphere(pos=receiver_pos, radius=0.16, color=color.red, emissive=True)
+lb_rx = label(pos=receiver_pos, text=&#x27;내 스마트폰&#x27;, color=color.red,
+              box=False, opacity=0, height=13, xoffset=18, yoffset=18)
+
+# -----------------------------------------------------------
+# 3. 위성 4개
+# -----------------------------------------------------------
+sat_lat = [ 62.0,  18.0, 46.0, -12.0]
+sat_lon = [100.0, 168.0, 55.0, 122.0]
+sat_col = [color.yellow, color.orange, color.magenta, vec(0.4,0.9,1.0)]
+
+N = 4
+sat_base = []
+sats     = []
+shells   = []
+links    = []
+sat_lbl  = []
+
+i = 0
+while i &lt; N:
+    p = sph_pos(Rsat, sat_lat[i], sat_lon[i])
+    sat_base.append(p)
+    s = sphere(pos=p, radius=0.22, color=sat_col[i], emissive=True)
+    sats.append(s)
+    sat_lbl.append(label(pos=p, text=&#x27;위성 &#x27; + str(i+1), color=sat_col[i],
+                         box=False, opacity=0, height=12, xoffset=14, yoffset=14))
+    d = mag(p - receiver_pos)
+    shells.append(sphere(pos=p, radius=d, color=sat_col[i],
+                         opacity=0.10, shininess=0))
+    links.append(curve(pos=[p, receiver_pos], color=sat_col[i],
+                       radius=0.018, opacity=0.7))
+    i = i + 1
+
+# 위성 2개일 때 생기는 교차원(빨간 링), 3개일 때 남는 후보점 2개
+ring12 = ring(pos=vec(0,0,0), axis=vec(0,0,1), radius=1, thickness=0.06,
+              color=color.green, opacity=0.9)
+cand   = []
+cand.append(sphere(pos=vec(0,0,0), radius=0.15, color=color.white, emissive=True))
+cand.append(sphere(pos=vec(0,0,0), radius=0.15, color=color.white, emissive=True))
+cand_lbl = []
+cand_lbl.append(label(text=&#x27;후보 1&#x27;, color=color.white, box=False, opacity=0,
+                      height=12, xoffset=14, yoffset=-16))
+cand_lbl.append(label(text=&#x27;후보 2&#x27;, color=color.white, box=False, opacity=0,
+                      height=12, xoffset=14, yoffset=-16))
+
+# -----------------------------------------------------------
+# 4. 계산 함수
+# -----------------------------------------------------------
+def two_sphere_ring(p1, r1, p2, r2):
+    # 두 구가 만나서 생기는 원의 중심과 반지름을 돌려준다
+    dv = p2 - p1
+    dm = mag(dv)
+    a  = (r1*r1 - r2*r2 + dm*dm) / (2*dm)
+    h2 = r1*r1 - a*a
+    if h2 &lt; 0:
+        h2 = 0
+    return [p1 + (a/dm)*dv, sqrt(h2), norm(dv)]
+
+def three_sphere_points(p1, r1, p2, r2, p3, r3):
+    # 세 구가 만나는 점 2개를 돌려준다
+    ex = norm(p2 - p1)
+    ii = dot(ex, p3 - p1)
+    tmp = (p3 - p1) - ii*ex
+    ey = norm(tmp)
+    ez = cross(ex, ey)
+    dd = mag(p2 - p1)
+    jj = dot(ey, p3 - p1)
+    xx = (r1*r1 - r2*r2 + dd*dd) / (2*dd)
+    yy = (r1*r1 - r3*r3 + ii*ii + jj*jj) / (2*jj) - (ii/jj)*xx
+    z2 = r1*r1 - xx*xx - yy*yy
+    if z2 &lt; 0:
+        z2 = 0
+    zz = sqrt(z2)
+    base = p1 + xx*ex + yy*ey
+    return [base + zz*ez, base - zz*ez]
+
+# -----------------------------------------------------------
+# 5. 화면 갱신
+# -----------------------------------------------------------
+nshow  = 1        # 지금 보여 주는 위성 수
+moving = True
+show_shell = True
+t = 0.0
+
+msg = [&#x27;위성 1개 :  내 위치의 후보는 구면 전체 -&gt; 무수히 많다&#x27;,
+       &#x27;위성 2개 :  두 구가 만나 생긴 원 위 -&gt; 아직 무수히 많다&#x27;,
+       &#x27;위성 3개 :  후보가 점 2개로 좁혀진다 -&gt; 하나는 지구 밖&#x27;,
+       &#x27;위성 4개 :  위치(x, y, z) 와 시계 오차까지 4개를 모두 확정&#x27;]
+
+def redraw():
+    i = 0
+    while i &lt; N:
+        on = (i &lt; nshow)
+        sats[i].visible   = on
+        sat_lbl[i].visible = on
+        links[i].visible  = on
+        shells[i].visible = on and show_shell
+        d = mag(sats[i].pos - receiver_pos)
+        shells[i].pos    = sats[i].pos
+        shells[i].radius = d
+        links[i].modify(0, pos=sats[i].pos)
+        links[i].modify(1, pos=receiver_pos)
+        sat_lbl[i].pos = sats[i].pos
+        i = i + 1
+
+    # 위성 2개 : 교차원
+    if nshow == 2:
+        r1 = mag(sats[0].pos - receiver_pos)
+        r2 = mag(sats[1].pos - receiver_pos)
+        res = two_sphere_ring(sats[0].pos, r1, sats[1].pos, r2)
+        ring12.pos     = res[0]
+        ring12.radius  = res[1]
+        ring12.axis    = res[2]
+        ring12.visible = True
+    else:
+        ring12.visible = False
+
+    # 위성 3개 : 후보점 2개
+    if nshow == 3:
+        r1 = mag(sats[0].pos - receiver_pos)
+        r2 = mag(sats[1].pos - receiver_pos)
+        r3 = mag(sats[2].pos - receiver_pos)
+        pts = three_sphere_points(sats[0].pos, r1, sats[1].pos, r2, sats[2].pos, r3)
+        k = 0
+        while k &lt; 2:
+            cand[k].pos = pts[k]
+            cand[k].visible = True
+            cand_lbl[k].pos = pts[k]
+            cand_lbl[k].visible = True
+            k = k + 1
+    else:
+        cand[0].visible = False
+        cand[1].visible = False
+        cand_lbl[0].visible = False
+        cand_lbl[1].visible = False
+
+    receiver.visible = (nshow &gt;= 3)
+    lb_rx.visible    = (nshow &gt;= 4)
+
+    txt = &#x27;\n  &#x27; + msg[nshow-1] + &#x27;\n\n&#x27;
+    i = 0
+    while i &lt; nshow:
+        dk = mag(sats[i].pos - receiver_pos) / Re * Re_KM
+        txt = txt + &#x27;   위성 &#x27; + str(i+1) + &#x27; 까지의 거리 = &#x27; + fmt(dk, 0) + &#x27; km\n&#x27;
+        i = i + 1
+    out.text = txt
+
+def set1(b):
+    global nshow
+    nshow = 1
+    redraw()
+
+def set2(b):
+    global nshow
+    nshow = 2
+    redraw()
+
+def set3(b):
+    global nshow
+    nshow = 3
+    redraw()
+
+def set4(b):
+    global nshow
+    nshow = 4
+    redraw()
+
+def set_move(c):
+    global moving
+    moving = c.checked
+
+def set_shell(c):
+    global show_shell
+    show_shell = c.checked
+    redraw()
+
+# -----------------------------------------------------------
+# 6. 조작판
+# -----------------------------------------------------------
+scene.append_to_caption(&#x27;\n  &#x27;)
+button(text=&#x27;  위성 1개  &#x27;, bind=set1)
+scene.append_to_caption(&#x27; &#x27;)
+button(text=&#x27;  위성 2개  &#x27;, bind=set2)
+scene.append_to_caption(&#x27; &#x27;)
+button(text=&#x27;  위성 3개  &#x27;, bind=set3)
+scene.append_to_caption(&#x27; &#x27;)
+button(text=&#x27;  위성 4개  &#x27;, bind=set4)
+scene.append_to_caption(&#x27;     &#x27;)
+cb_shell = checkbox(text=&#x27; 거리를 나타내는 구 보이기 &#x27;, checked=True, bind=set_shell)
+scene.append_to_caption(&#x27;  &#x27;)
+cb_move = checkbox(text=&#x27; 위성 움직이기 &#x27;, checked=True, bind=set_move)
+scene.append_to_caption(&#x27;\n&#x27;)
+out = wtext(text=&#x27;&#x27;)
+redraw()
+
+# -----------------------------------------------------------
+# 7. 실행 루프
+# -----------------------------------------------------------
+while True:
+    rate(30)
+    if moving:
+        t = t + 0.01
+        i = 0
+        while i &lt; N:
+            a = t * 0.6 + i * pi / 2
+            base = sat_base[i]
+            side = norm(cross(base, vec(0,0,1)))
+            up2  = norm(cross(side, base))
+            sats[i].pos = base + 0.7*sin(a)*side + 0.7*cos(a)*up2
+            i = i + 1
+    redraw()
+</script>
+<script>
+/* ===== 설정 : 배포한 Google Apps Script 웹앱 URL 을 여기에 붙여 넣으세요 ===== */
+var GAS_URL = "";
+/* 예) var GAS_URL = "https://script.google.com/macros/s/AKfycb....../exec"; */
+
+var LS_KEY = "trig_gps_worksheet_v2";
+
+/* 코드 블록 채우기 */
+function fillCode(id, srcId){
+  var el = document.getElementById(id);
+  if(el) el.textContent = document.getElementById(srcId).textContent;
+}
+
+function copyCode(id, btn){
+  var txt = document.getElementById(id).textContent;
+  var done = function(){
+    var o = btn.textContent; btn.textContent = "복사되었습니다";
+    setTimeout(function(){ btn.textContent = o; }, 1400);
+  };
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(txt).then(done, function(){ fallbackCopy(txt, done); });
+  } else { fallbackCopy(txt, done); }
+}
+function fallbackCopy(txt, done){
+  var ta = document.createElement("textarea");
+  ta.value = txt; ta.style.position="fixed"; ta.style.opacity="0";
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand("copy"); done(); }catch(e){ alert("복사에 실패했습니다. 코드 영역을 직접 선택해 주세요."); }
+  document.body.removeChild(ta);
+}
+function downCode(id, fname){
+  var txt = document.getElementById(id).textContent;
+  var b = new Blob([txt], {type:"text/plain;charset=utf-8"});
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(b); a.download = fname;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
+
+/* ===== 빈칸 ===== */
+var BLANKS = [];
+function initBlanks(){
+  var secs = document.querySelectorAll("section");
+  for(var i=0;i<secs.length;i++){
+    var ins = secs[i].querySelectorAll("input.bl");
+    for(var j=0;j<ins.length;j++){
+      ins[j].dataset.k = secs[i].id + "-" + j;
+      ins[j].addEventListener("input", onInput);
+      BLANKS.push(ins[j]);
+    }
+  }
+}
+function onInput(e){
+  e.target.classList.remove("good","bad");
+  saveLocal(); updateProgress();
+}
+
+function norm(s){
+  if(s===null || s===undefined) return "";
+  s = String(s).trim().toLowerCase();
+  s = s.replace(/\s+/g,"");
+  s = s.replace(/,/g,"");
+  s = s.replace(/[°˚]/g,"");
+  s = s.replace(/세타|theta/g,"θ");
+  s = s.replace(/파이|phi/g,"φ");
+  s = s.replace(/루트/g,"√");
+  s = s.replace(/km|m$/,"");
+  s = s.replace(/개$|곳$/,"");
+  s = s.replace(/입니다$|이다$|다$/,"");
+  return s;
+}
+function isRight(inp){
+  var user = norm(inp.value);
+  if(user==="") return false;
+  var list = (inp.dataset.a||"").split("|");
+  for(var i=0;i<list.length;i++){
+    if(norm(list[i])===user) return true;
+  }
+  return false;
+}
+function check(btn){
+  var box = btn.closest(".qbox");
+  var ins = box.querySelectorAll("input.bl");
+  var n=0;
+  for(var i=0;i<ins.length;i++){
+    ins[i].classList.remove("good","bad");
+    if(ins[i].value.trim()===""){ continue; }
+    if(isRight(ins[i])){ ins[i].classList.add("good"); n++; }
+    else { ins[i].classList.add("bad"); }
+  }
+  box.querySelector(".qres").textContent = ins.length + "칸 중 " + n + "칸 정답입니다.";
+  updateProgress();
+}
+function updateProgress(){
+  var n=0;
+  for(var i=0;i<BLANKS.length;i++){ if(isRight(BLANKS[i])) n++; }
+  var pct = BLANKS.length ? Math.round(n/BLANKS.length*100) : 0;
+  document.getElementById("pb").style.width = pct + "%";
+  document.getElementById("pctxt").textContent = "정답 " + n + " / " + BLANKS.length + "칸 (" + pct + "%)";
+}
+
+/* ===== 로컬 임시 저장 ===== */
+function collect(){
+  var o = {};
+  for(var i=0;i<BLANKS.length;i++){ o[BLANKS[i].dataset.k] = BLANKS[i].value; }
+  return o;
+}
+function apply(o){
+  if(!o) return 0;
+  var c=0;
+  for(var i=0;i<BLANKS.length;i++){
+    var k = BLANKS[i].dataset.k;
+    if(o[k]!==undefined && o[k]!==null){ BLANKS[i].value = o[k]; if(String(o[k]).trim()!=="") c++; }
+  }
+  updateProgress();
+  return c;
+}
+function saveLocal(){
+  try{
+    localStorage.setItem(LS_KEY, JSON.stringify({
+      sid: document.getElementById("sid").value,
+      name: document.getElementById("name").value,
+      answers: collect()
+    }));
+  }catch(e){}
+}
+function loadLocal(){
+  try{
+    var raw = localStorage.getItem(LS_KEY);
+    if(!raw) return;
+    var d = JSON.parse(raw);
+    if(d.sid) document.getElementById("sid").value = d.sid;
+    if(d.name) document.getElementById("name").value = d.name;
+    apply(d.answers);
+  }catch(e){}
+}
+
+/* ===== 상태 표시 ===== */
+function stat(msg, kind){
+  var el = document.getElementById("stat");
+  el.textContent = msg;
+  el.className = "stat" + (kind ? " " + kind : "");
+}
+function checkId(){
+  var sid = document.getElementById("sid").value.trim();
+  var name = document.getElementById("name").value.trim();
+  if(!sid || !name){ stat("먼저 학번과 이름을 입력해 주세요.", "err"); return null; }
+  if(!GAS_URL){ stat("서버 주소(GAS_URL)가 설정되지 않았습니다. 선생님께 알려 주세요.", "err"); return null; }
+  return {sid: sid, name: name};
+}
+
+/* ===== 저장 (Google Apps Script) ===== */
+function doSave(){
+  var id = checkId(); if(!id) return;
+  saveLocal();
+  stat("저장하는 중입니다...");
+  var body = JSON.stringify({sid:id.sid, name:id.name, answers:collect()});
+  fetch(GAS_URL, {method:"POST", body: body})
+    .then(function(r){ return r.json(); })
+    .then(function(res){
+      if(res && res.ok) stat("저장되었습니다. (" + new Date().toLocaleTimeString() + ")", "ok");
+      else stat("저장에 실패했습니다. " + (res && res.error ? res.error : ""), "err");
+    })
+    .catch(function(){
+      fetch(GAS_URL, {method:"POST", mode:"no-cors", body: body})
+        .then(function(){ stat("저장 요청을 보냈습니다. 불러오기로 확인해 주세요.", "ok"); })
+        .catch(function(){ stat("저장에 실패했습니다. 인터넷 연결을 확인해 주세요.", "err"); });
+    });
+}
+
+/* ===== 불러오기 (JSONP) ===== */
+var jsonpSeq = 0;
+function doLoad(){
+  var id = checkId(); if(!id) return;
+  stat("불러오는 중입니다...");
+  jsonpSeq++;
+  var cb = "__wcb" + jsonpSeq + "_" + Date.now();
+  var s = document.createElement("script");
+  var timer = setTimeout(function(){ cleanup(); stat("불러오기에 실패했습니다. 잠시 후 다시 시도해 주세요.", "err"); }, 12000);
+  function cleanup(){
+    clearTimeout(timer);
+    try{ delete window[cb]; }catch(e){ window[cb] = undefined; }
+    if(s.parentNode) s.parentNode.removeChild(s);
+  }
+  window[cb] = function(res){
+    cleanup();
+    if(res && res.ok && res.data){
+      var n = apply(res.data);
+      saveLocal();
+      stat("불러왔습니다. " + n + "칸을 채웠습니다.", "ok");
+    } else if(res && res.ok){
+      stat("저장된 기록이 없습니다. 학번과 이름을 확인해 주세요.", "err");
+    } else {
+      stat("불러오기에 실패했습니다. " + (res && res.error ? res.error : ""), "err");
+    }
+  };
+  s.src = GAS_URL + "?action=load&sid=" + encodeURIComponent(id.sid)
+        + "&name=" + encodeURIComponent(id.name) + "&callback=" + cb;
+  s.onerror = function(){ cleanup(); stat("서버에 연결하지 못했습니다.", "err"); };
+  document.body.appendChild(s);
+}
+
+window.addEventListener("DOMContentLoaded", function(){
+  fillCode("codeA","srcA");
+  fillCode("codeB","srcB");
+  initBlanks();
+  loadLocal();
+  updateProgress();
+  document.getElementById("sid").addEventListener("input", saveLocal);
+  document.getElementById("name").addEventListener("input", saveLocal);
+  document.getElementById("btnLoad").addEventListener("click", doLoad);
+  document.getElementById("btnSave").addEventListener("click", doSave);
+});
+</script>
+</body>
+</html>
