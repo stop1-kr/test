@@ -21,7 +21,7 @@ Web VPython 3.2
 R = 6371.0              # 지구 반지름 (km)
 USE_TEXTURE = True      # False 로 두면 텍스처 없이 파란 반투명 지구
 EARTH_OPACITY = 0.62    # 1.0 에 가까울수록 불투명 (내부 보조선이 덜 보임)
-TEX_LON_OFFSET = 0      # 지구 텍스처의 경도가 어긋나 보이면 이 값(도)을 조절
+TEX_LON_OFFSET = 90      # 지구 텍스처의 경도가 어긋나 보이면 이 값(도)을 조절
 
 C_AXIS = vec(0.30, 0.30, 0.36)   # 좌표축
 C_P    = vec(0.86, 0.12, 0.12)   # 점 P, 동경 OP
